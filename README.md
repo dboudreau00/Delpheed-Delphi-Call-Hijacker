@@ -1,6 +1,9 @@
 
+<img width="1024" height="692" alt="9105b90f-e021-458f-b723-79b90ddadafa" src="https://github.com/user-attachments/assets/6629a254-c929-4cd0-a7a5-c87bfce4c38c" />
 
-# Delpheed
+
+
+
 
 A small reverse-engineering toolkit for **Delphi PE executables**, written in Delphi.
 It parses the binary, recovers the class model from Delphi's runtime metadata, and — for
