@@ -7,7 +7,7 @@ It parses the binary, recovers the class model from Delphi's runtime metadata, a
 packed samples — unpacks them via a debugger so the real class information becomes
 readable. Think of it as a focused, Delphi-aware slice of what IDA + Scylla do.
 
-<img width="1024" height="692" alt="59fcfaa6-c8de-47e9-9611-5b703894063a" src="https://github.com/user-attachments/assets/bc56e7a2-d865-45eb-b2a1-62fd8074f7f3" />
+
 
 **New here?** See **`TUTORIAL.md`** for a hands-on, step-by-step walkthrough.
 
