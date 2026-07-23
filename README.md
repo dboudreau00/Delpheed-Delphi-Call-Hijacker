@@ -158,5 +158,5 @@ friendly, via `uConsoleOut`:
   one silently desyncs.
 - **RTTI pass** — walk the TypeInfo/Field/Method tables (already exposed per class) to
   recover published properties, methods, and enum names.
-- **x64 unpacking** — a guard-page finder variant plus 64-bit import rebuild.
+- **x64 unpacking** — a guard-page finder variant plus 64-bit import rebuild. Prototype in [Delpheed-64bit]
 
