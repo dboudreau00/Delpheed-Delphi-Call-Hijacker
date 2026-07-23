@@ -5,10 +5,7 @@ It parses the binary, recovers the class model from Delphi's runtime metadata, a
 packed samples — unpacks them via a debugger so the real class information becomes
 readable. Think of it as a focused, Delphi-aware slice of what IDA + Scylla do.
 
-> **Safety.** The unpacking tools *run the target's own unpacking stub* under a debugger.
-> Only point them at binaries you are authorised to analyse, and run untrusted samples
-> inside a disposable virtual machine. The tools freeze the target at its original entry
-> point and terminate it without ever running its real code, but the stub does execute.
+<img width="2720" height="1840" alt="delpheed_pipeline" src="https://github.com/user-attachments/assets/cbb2ca08-ff27-44bc-a1f4-4cfc6699b589" />
 
 **New here?** See **`TUTORIAL.md`** for a hands-on, step-by-step walkthrough.
 
@@ -156,3 +153,4 @@ friendly, via `uConsoleOut`:
 - **RTTI pass** — walk the TypeInfo/Field/Method tables (already exposed per class) to
   recover published properties, methods, and enum names.
 - **x64 unpacking** — a guard-page finder variant plus 64-bit import rebuild.
+
