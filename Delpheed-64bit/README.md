@@ -1,14 +1,15 @@
 # Delpheed
 
+<img width="2508" height="1696" alt="Gemini_Generated_Image_fp19rfp19rfp19rf" src="https://github.com/user-attachments/assets/c1e16adc-32e5-4985-b2c0-54014dcfac53" />
+
+
+
+
 A small reverse-engineering toolkit for **Delphi PE executables**, written in Delphi.
 It parses the binary, recovers the class model from Delphi's runtime metadata, and — for
 packed samples — unpacks them via a debugger so the real class information becomes
 readable. Think of it as a focused, Delphi-aware slice of what IDA + Scylla do.
 
-> **Safety.** The unpacking tools *run the target's own unpacking stub* under a debugger.
-> Only point them at binaries you are authorised to analyse, and run untrusted samples
-> inside a disposable virtual machine. The tools freeze the target at its original entry
-> point and terminate it without ever running its real code, but the stub does execute.
 
 **New here?** See **`TUTORIAL.md`** for a hands-on, step-by-step walkthrough.
 
