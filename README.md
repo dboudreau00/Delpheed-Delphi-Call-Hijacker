@@ -1,3 +1,4 @@
+
 # Delpheed
 
 A small reverse-engineering toolkit for **Delphi PE executables**, written in Delphi.
@@ -5,7 +6,7 @@ It parses the binary, recovers the class model from Delphi's runtime metadata, a
 packed samples — unpacks them via a debugger so the real class information becomes
 readable. Think of it as a focused, Delphi-aware slice of what IDA + Scylla do.
 
-<img width="2720" height="1840" alt="delpheed_pipeline" src="https://github.com/user-attachments/assets/cbb2ca08-ff27-44bc-a1f4-4cfc6699b589" />
+<img width="2720" height="1840" alt="delpheed_pipeline" src="https://github.com/user-attachments/assets/e7d9a0c9-eeda-44b0-a2c9-42254ebe02ba" />
 
 **New here?** See **`TUTORIAL.md`** for a hands-on, step-by-step walkthrough.
 
