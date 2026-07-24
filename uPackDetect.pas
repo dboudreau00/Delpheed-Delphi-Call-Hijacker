@@ -96,9 +96,15 @@ var
   i: NativeInt;
   c: Integer;
   p: Double;
+  avail: Int64;
 begin
   Result := 0;
-  if (Len <= 0) or (Start < 0) or (Start + Len > Length(Buf)) then Exit;
+  if (Start < 0) or (Start >= Length(Buf)) or (Len = 0) then Exit;
+  // Measure the bytes actually present: a section whose raw extent overhangs the
+  // file (or whose size truncated negative) must not read as entropy 0 and hide a
+  // packed stub. Clamp to the remaining buffer instead of discarding the section.
+  avail := Int64(Length(Buf)) - Start;
+  if (Len < 0) or (Len > avail) then Len := avail;
   FillChar(counts, SizeOf(counts), 0);
   for i := Start to Start + Len - 1 do
     Inc(counts[Buf[i]]);

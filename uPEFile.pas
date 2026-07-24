@@ -238,6 +238,7 @@ var
   n: Int64;
 begin
   n := Stream.Size - Stream.Position;
+  if n < 0 then n := 0;                  // stream positioned past its end
   SetLength(FImage, n);
   if n > 0 then
     Stream.ReadBuffer(FImage[0], n);
@@ -268,7 +269,7 @@ begin
     if vsize = 0 then
       vsize := FSections[i].SizeOfRawData;
     if (RVA >= FSections[i].VirtualAddress) and
-       (RVA <  FSections[i].VirtualAddress + vsize) then
+       (UInt64(RVA) < UInt64(FSections[i].VirtualAddress) + UInt64(vsize)) then
       Exit(i);
   end;
 end;
@@ -321,12 +322,25 @@ end;
 function TPEFile.ReadBytesRVA(RVA: Cardinal; var Buffer; Count: Integer): Boolean;
 var
   ofs: Int64;
+  idx: Integer;
+  delta: Cardinal;
 begin
   Result := False;
   if Count <= 0 then Exit;
   ofs := RVAToOffset(RVA);
   if ofs < 0 then Exit;
   if ofs + Count > Length(FImage) then Exit;
+  // Do not let a read run past the resolved section's raw data into the next
+  // section: a value spliced from two unrelated addresses would be silently wrong.
+  if RVA >= FSizeOfHeaders then
+  begin
+    idx := SectionIndexForRVA(RVA);
+    if idx >= 0 then
+    begin
+      delta := RVA - FSections[idx].VirtualAddress;
+      if Int64(delta) + Count > FSections[idx].SizeOfRawData then Exit;
+    end;
+  end;
   Move(FImage[ofs], Buffer, Count);
   Result := True;
 end;

@@ -402,6 +402,14 @@ begin
     Exit(R);
   end;
   lfanew := PCardinal(@f[$3C])^;
+  // The dump's headers come from an untrusted target's memory; validate the PE
+  // header window in 64-bit before dereferencing anything through lfanew.
+  // 24 (file header) + 96 (to data dirs, PE32) + (DDIR_IAT+1)*8 (through the IAT dir).
+  if UInt64(lfanew) + 24 + 96 + (DDIR_IAT + 1) * 8 > UInt64(Length(f)) then
+  begin
+    R.Message := 'Dump headers are truncated; cannot rebuild.';
+    Exit(R);
+  end;
   optOfs := lfanew + 24;
   if PWord(@f[optOfs])^ <> $10B then
   begin
@@ -418,13 +426,27 @@ begin
   secTab        := optOfs + sizeOpt;
   ddBase        := optOfs + 96;
 
-  if (Cardinal(Length(f)) < optOfs + 64) or
-     (Cardinal(Length(f)) < secTab + Cardinal(numSecs) * 40) or
-     (Cardinal(Length(f)) < ddBase + (DDIR_IAT + 1) * 8) then
+  if UInt64(secTab) + UInt64(numSecs) * 40 > UInt64(Length(f)) then
   begin
     R.Message := 'Dump headers are truncated; cannot rebuild.';
     Exit(R);
   end;
+
+  // Alignment fields feed Align(); a zero or non-power-of-two value makes Align()
+  // return 0 and turns the section-append below into an out-of-bounds heap write.
+  if (fileAlign = 0) or ((fileAlign and (fileAlign - 1)) <> 0) or
+     (secAlign = 0)  or ((secAlign and (secAlign - 1)) <> 0) or
+     (fileAlign > $10000) or (secAlign < fileAlign) or
+     (FSizeOfImage > $40000000) then
+  begin
+    R.Message := 'Dump has invalid alignment/size fields; cannot rebuild.';
+    Exit(R);
+  end;
+
+  // sizeOfHeaders drives the IAT-scan start and the section-room check; clamp it so
+  // a bogus value cannot truncate to a negative scan index on a 32-bit build.
+  if sizeOfHeaders > Cardinal(Length(f)) then
+    sizeOfHeaders := Cardinal(Length(f));
 
   EnumModules;
   if FMods.Count = 0 then

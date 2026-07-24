@@ -201,10 +201,12 @@ begin
     begin
       if FPE.Sections[s].SizeOfRawData = 0 then Continue;
 
-      o := FPE.Sections[s].PointerToRawData;
-      endOff := NativeInt(FPE.Sections[s].PointerToRawData) +
-                NativeInt(FPE.Sections[s].SizeOfRawData);
-      if endOff > imgLen then endOff := imgLen;
+      // Section fields are attacker-controlled; validate width-independently so a
+      // huge PointerToRawData cannot truncate to a negative NativeInt index (OOB read).
+      if FPE.Sections[s].PointerToRawData >= Cardinal(imgLen) then Continue;
+      o := NativeInt(FPE.Sections[s].PointerToRawData);
+      endOff := o + NativeInt(FPE.Sections[s].SizeOfRawData);
+      if (endOff < o) or (endOff > imgLen) then endOff := imgLen;
 
       while o + ptr <= endOff do
       begin

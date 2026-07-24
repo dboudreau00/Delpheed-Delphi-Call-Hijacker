@@ -197,7 +197,8 @@ begin
 
   if PWord(@hdr[0])^ <> $5A4D then Exit;
   FLfanew := PCardinal(@hdr[$3C])^;
-  if FLfanew + 256 > Cardinal(Length(hdr)) then
+  if FLfanew > $10000 then Exit;                          // absurd e_lfanew (malformed/hostile)
+  if UInt64(FLfanew) + 256 > UInt64(Length(hdr)) then     // 64-bit compare: cannot wrap
   begin
     SetLength(hdr, FLfanew + 1024);
     if not ReadMem(FBase, hdr[0], Length(hdr)) then Exit;
@@ -212,6 +213,7 @@ begin
 
   FSizeOfImage   := PCardinal(@hdr[FOptOfs + 56])^;       // same offsets as PE32
   FSizeOfHeaders := PCardinal(@hdr[FOptOfs + 60])^;
+  if (FSizeOfImage = 0) or (FSizeOfImage > $40000000) then Exit;  // 0 or > 1 GB: malformed
   numSecs        := PWord(@hdr[FLfanew + 6])^;
   sizeOpt        := PWord(@hdr[FLfanew + 20])^;
   FSecTab        := FOptOfs + sizeOpt;
@@ -292,7 +294,15 @@ var
 begin
   Result := False;
   if FSizeOfImage = 0 then Exit;
-  SetLength(buf, FSizeOfImage);
+  try
+    SetLength(buf, FSizeOfImage);                // FSizeOfImage is capped in ParseHeaders
+  except
+    on E: Exception do
+    begin
+      Log('Dump allocation failed: ' + E.Message);
+      Exit;
+    end;
+  end;
 
   off := 0; total := 0;
   while off < FSizeOfImage do
